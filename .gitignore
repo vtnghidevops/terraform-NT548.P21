@@ -1,0 +1,18 @@
+# Terraform generated files
+.terraform/
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.backup
+crash.log
+
+# Terraform variable overrides (có thể chứa secret)
+terraform.tfvars
+*.tfvars
+
+# IDE/editor
+*.swp
+*.bak
+*.tmp
+*.vscode/
+*.idea/
+
