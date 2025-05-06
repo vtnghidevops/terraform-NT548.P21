@@ -12,5 +12,5 @@ variable "vpc_id" {
 variable "allowed_ip" {
   description = "IP address allowed to connect to public instances"
   type        = string
-  default     = "14.169.15.220/32"  
+  default     = "14.169.33.91/32"  
 } 
