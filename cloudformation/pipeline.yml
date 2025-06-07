@@ -34,7 +34,76 @@ Resources:
         Status: Enabled
     DeletionPolicy: Delete
 
-  # IAM roles
+  # IAM roles with restricted policies
+  CodeBuildServiceRolePolicy:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      Description: Policy for CodeBuild service role
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+          - 'logs:CreateLogGroup'
+          - 'logs:CreateLogStream'
+          - 'logs:PutLogEvents'
+          Resource: '*'
+        - Effect: Allow
+          Action:
+          - 's3:GetObject'
+          - 's3:GetObjectVersion'
+          - 's3:PutObject'
+          Resource:
+          - !Sub 'arn:aws:s3:::${ArtifactBucket}/*'
+        - Effect: Allow
+          Action:
+          - 'cloudformation:ValidateTemplate'
+          Resource: '*'
+        - Effect: Allow
+          Action:
+          - 'ec2:DescribeAvailabilityZones'
+          - 'ec2:DescribeVpcs'
+          - 'ec2:DescribeSubnets'
+          - 'ec2:DescribeSecurityGroups'
+          - 'ec2:DescribeInstances'
+          Resource: '*'
+
+  CodePipelineServiceRolePolicy:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      Description: Policy for CodePipeline service role
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+          - 's3:GetObject'
+          - 's3:GetObjectVersion'
+          - 's3:PutObject'
+          - 's3:GetBucketVersioning'
+          Resource:
+          - !Sub 'arn:aws:s3:::${ArtifactBucket}'
+          - !Sub 'arn:aws:s3:::${ArtifactBucket}/*'
+        - Effect: Allow
+          Action:
+          - 'codebuild:StartBuild'
+          - 'codebuild:BatchGetBuilds'
+          Resource: !GetAtt CodeBuildProject.Arn
+        - Effect: Allow
+          Action:
+          - 'cloudformation:CreateStack'
+          - 'cloudformation:DeleteStack'
+          - 'cloudformation:DescribeStacks'
+          - 'cloudformation:UpdateStack'
+          - 'cloudformation:CreateChangeSet'
+          - 'cloudformation:DeleteChangeSet'
+          - 'cloudformation:DescribeChangeSet'
+          - 'cloudformation:ExecuteChangeSet'
+          - 'cloudformation:SetStackPolicy'
+          - 'cloudformation:ValidateTemplate'
+          - 'iam:PassRole'
+          Resource: '*'
+
   CodeBuildServiceRole:
     Type: 'AWS::IAM::Role'
     Properties:
@@ -46,7 +115,7 @@ Resources:
             Service: codebuild.amazonaws.com
           Action: 'sts:AssumeRole'
       ManagedPolicyArns:
-      - 'arn:aws:iam::aws:policy/AdministratorAccess'
+      - !Ref CodeBuildServiceRolePolicy
 
   CodePipelineServiceRole:
     Type: 'AWS::IAM::Role'
@@ -59,7 +128,22 @@ Resources:
             Service: codepipeline.amazonaws.com
           Action: 'sts:AssumeRole'
       ManagedPolicyArns:
-      - 'arn:aws:iam::aws:policy/AdministratorAccess'
+      - !Ref CodePipelineServiceRolePolicy
+
+  # CloudFormation execution role with limited permissions
+  CloudFormationExecutionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: cloudformation.amazonaws.com
+          Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+      - 'arn:aws:iam::aws:policy/AmazonVPCFullAccess'
+      - 'arn:aws:iam::aws:policy/AmazonEC2FullAccess'
 
   # CodeBuild project
   CodeBuildProject:
@@ -135,8 +219,9 @@ Resources:
           Configuration:
             ActionMode: CREATE_UPDATE
             StackName: !Ref CloudFormationStackName
-            TemplatePath: BuildOutput::cloudformation/cloudformation.yaml
+            TemplatePath: BuildOutput::cloudformation/cloudformation.yml
             TemplateConfiguration: BuildOutput::cloudformation/parameters.json
+            RoleArn: !GetAtt CloudFormationExecutionRole.Arn
             Capabilities: CAPABILITY_IAM,CAPABILITY_NAMED_IAM,CAPABILITY_AUTO_EXPAND
           InputArtifacts:
           - Name: BuildOutput

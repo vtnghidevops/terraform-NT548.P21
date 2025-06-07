@@ -2,14 +2,14 @@ project:
   name: cloudformation-infrastructure
   regions:
   - us-east-1
+  - ap-southeast-1 # Thêm một region nữa để kiểm tra khả năng triển khai đa vùng
   package-lambda: false
   parameters:
-    KeyName: ''
-  template: cloudformation.yaml
+    KeyName: 'terraform-lab'
 
 tests:
   infrastructure:
-    template: cloudformation.yaml
+    template: cloudformation.yml
     regions:
     - us-east-1
     parameters:
