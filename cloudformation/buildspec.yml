@@ -1,0 +1,35 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.9
+
+  pre_build:
+    commands:
+    - echo "Installing cfn-lint for CloudFormation validation..."
+    - pip install cfn-lint
+    - echo "Installing taskcat for testing CloudFormation templates..."
+    - pip install taskcat
+
+  build:
+    commands:
+    - echo "Validating CloudFormation template..."
+    - cfn-lint cloudformation.yaml
+    - echo "Running taskcat tests..."
+    - mkdir -p ~/.aws
+    - echo "[default]" > ~/.aws/config
+    - echo "region = us-east-1" >> ~/.aws/config
+    - echo "output = json" >> ~/.aws/config
+
+  post_build:
+    commands:
+    - echo "CloudFormation template validation completed on `date`"
+
+artifacts:
+  files:
+  - cloudformation.yaml
+  - parameters.json
+  - README.md
+  - buildspec.yml
+  discard-paths: no

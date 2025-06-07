@@ -1,0 +1,21 @@
+project:
+  name: cloudformation-infrastructure
+  regions:
+  - us-east-1
+  package-lambda: false
+  parameters:
+    KeyName: ''
+  template: cloudformation.yaml
+
+tests:
+  infrastructure:
+    template: cloudformation.yaml
+    regions:
+    - us-east-1
+    parameters:
+      Prefix: test-infrastructure
+      VpcCidr: 10.0.0.0/16
+      PublicSubnetCidr: 10.0.1.0/24
+      PrivateSubnetCidr: 10.0.2.0/24
+      AllowedIp: 0.0.0.0/0
+      InstanceType: t2.micro

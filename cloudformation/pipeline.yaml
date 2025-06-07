@@ -1,0 +1,151 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'CloudFormation template for CodePipeline to deploy CloudFormation templates'
+
+Parameters:
+  GitHubOwner:
+    Type: String
+    Description: GitHub repository owner
+
+  GitHubRepo:
+    Type: String
+    Description: GitHub repository name
+
+  GitHubBranch:
+    Type: String
+    Default: main
+    Description: GitHub repository branch
+
+  GitHubToken:
+    Type: String
+    NoEcho: true
+    Description: GitHub OAuth token for accessing the repository
+
+  CloudFormationStackName:
+    Type: String
+    Default: cloudformation-infrastructure
+    Description: Name of CloudFormation stack to be deployed
+
+Resources:
+  # S3 bucket for storing artifacts
+  ArtifactBucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      VersioningConfiguration:
+        Status: Enabled
+    DeletionPolicy: Delete
+
+  # IAM roles
+  CodeBuildServiceRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: codebuild.amazonaws.com
+          Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+      - 'arn:aws:iam::aws:policy/AdministratorAccess'
+
+  CodePipelineServiceRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: codepipeline.amazonaws.com
+          Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+      - 'arn:aws:iam::aws:policy/AdministratorAccess'
+
+  # CodeBuild project
+  CodeBuildProject:
+    Type: 'AWS::CodeBuild::Project'
+    Properties:
+      Name: !Sub '${GitHubRepo}-build'
+      Description: 'Build project for CloudFormation templates'
+      ServiceRole: !GetAtt CodeBuildServiceRole.Arn
+      Artifacts:
+        Type: CODEPIPELINE
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/amazonlinux2-x86_64-standard:3.0
+        PrivilegedMode: false
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: cloudformation/buildspec.yml
+      TimeoutInMinutes: 10
+
+  # CodePipeline
+  Pipeline:
+    Type: 'AWS::CodePipeline::Pipeline'
+    Properties:
+      Name: !Sub '${GitHubRepo}-pipeline'
+      RoleArn: !GetAtt CodePipelineServiceRole.Arn
+      ArtifactStore:
+        Type: S3
+        Location: !Ref ArtifactBucket
+      Stages:
+      # Source Stage - Get code from GitHub
+      - Name: Source
+        Actions:
+        - Name: Source
+          ActionTypeId:
+            Category: Source
+            Owner: ThirdParty
+            Provider: GitHub
+            Version: '1'
+          Configuration:
+            Owner: !Ref GitHubOwner
+            Repo: !Ref GitHubRepo
+            Branch: !Ref GitHubBranch
+            OAuthToken: !Ref GitHubToken
+          OutputArtifacts:
+          - Name: SourceCode
+
+      # Build Stage - Validate CloudFormation templates
+      - Name: Build
+        Actions:
+        - Name: ValidateTemplates
+          ActionTypeId:
+            Category: Build
+            Owner: AWS
+            Provider: CodeBuild
+            Version: '1'
+          Configuration:
+            ProjectName: !Ref CodeBuildProject
+          InputArtifacts:
+          - Name: SourceCode
+          OutputArtifacts:
+          - Name: BuildOutput
+
+      # Deploy Stage - Deploy CloudFormation stack
+      - Name: Deploy
+        Actions:
+        - Name: CreateOrUpdateStack
+          ActionTypeId:
+            Category: Deploy
+            Owner: AWS
+            Provider: CloudFormation
+            Version: '1'
+          Configuration:
+            ActionMode: CREATE_UPDATE
+            StackName: !Ref CloudFormationStackName
+            TemplatePath: BuildOutput::cloudformation/cloudformation.yaml
+            TemplateConfiguration: BuildOutput::cloudformation/parameters.json
+            Capabilities: CAPABILITY_IAM,CAPABILITY_NAMED_IAM,CAPABILITY_AUTO_EXPAND
+          InputArtifacts:
+          - Name: BuildOutput
+
+Outputs:
+  PipelineURL:
+    Description: URL to the CodePipeline console
+    Value: !Sub https://console.aws.amazon.com/codepipeline/home?region=${AWS::Region}#/view/${Pipeline}
+
+  ArtifactBucketName:
+    Description: Name of the S3 bucket used to store build artifacts
+    Value: !Ref ArtifactBucket
