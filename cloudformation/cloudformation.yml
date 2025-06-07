@@ -3,7 +3,7 @@ Description: AWS Infrastructure with similar configuration to Terraform setup
 
 Parameters:
   Prefix:
-    Description: Prefix for all resources
+    Description: Prefix for all resources 
     Type: String
     Default: cloudformation-demo
   
@@ -13,12 +13,12 @@ Parameters:
     Default: 10.0.0.0/16
   
   PublicSubnetCidr:
-    Description: CIDR block for public subnet
+    Description: CIDR block for public subnet 
     Type: String
     Default: 10.0.1.0/24
   
   PrivateSubnetCidr:
-    Description: CIDR block for private subnet
+    Description: CIDR block for private subnet 
     Type: String
     Default: 10.0.2.0/24
   
@@ -217,7 +217,7 @@ Resources:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: !Ref InstanceType
-      ImageId: ami-0e83be366243f524a # Amazon Linux 2023 in us-east-1
+      ImageId: ami-002d3099f9f13bd3b # Amazon Linux 2023 in us-east-1
       KeyName: !If [HasKeyName, !Ref KeyName, !Ref "AWS::NoValue"]
       SubnetId: !Ref PublicSubnet
       SecurityGroupIds:
@@ -231,7 +231,7 @@ Resources:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: !Ref InstanceType
-      ImageId: ami-0e83be366243f524a # Amazon Linux 2023 in us-east-1
+      ImageId: ami-002d3099f9f13bd3b # Amazon Linux 2023 in us-east-1
       KeyName: !If [HasKeyName, !Ref KeyName, !Ref "AWS::NoValue"]
       SubnetId: !Ref PrivateSubnet
       SecurityGroupIds:
@@ -242,55 +242,55 @@ Resources:
 
 Outputs:
   VpcId:
-    Description: ID of the VPC (mã định danh VPC)
+    Description: ID of the VPC 
     Value: !Ref VPC
     Export:
       Name: !Sub ${AWS::StackName}-vpc-id
 
   PublicSubnetId:
-    Description: ID of the public subnet (mã định danh mạng con công cộng)
+    Description: ID of the public subnet 
     Value: !Ref PublicSubnet
     Export:
       Name: !Sub ${AWS::StackName}-public-subnet-id
 
   PrivateSubnetId:
-    Description: ID of the private subnet (mã định danh mạng con riêng tư)
+    Description: ID of the private subnet 
     Value: !Ref PrivateSubnet
     Export:
       Name: !Sub ${AWS::StackName}-private-subnet-id
 
   DefaultSecurityGroupId:
-    Description: ID of the default security group (nhóm bảo mật mặc định)
+    Description: ID of the default security group 
     Value: !Ref DefaultSecurityGroup
     Export:
       Name: !Sub ${AWS::StackName}-default-sg-id
 
   PublicEC2SecurityGroupId:
-    Description: ID of the public EC2 security group (nhóm bảo mật EC2 công cộng)
+    Description: ID of the public EC2 security group 
     Value: !Ref PublicEC2SecurityGroup
     Export:
       Name: !Sub ${AWS::StackName}-public-ec2-sg-id
 
   PrivateEC2SecurityGroupId:
-    Description: ID of the private EC2 security group (nhóm bảo mật EC2 riêng tư)
+    Description: ID of the private EC2 security group 
     Value: !Ref PrivateEC2SecurityGroup
     Export:
       Name: !Sub ${AWS::StackName}-private-ec2-sg-id
 
   PublicInstanceId:
-    Description: ID of the public EC2 instance (máy chủ EC2 công cộng)
+    Description: ID of the public EC2 instance 
     Value: !Ref PublicEC2Instance
     Export:
       Name: !Sub ${AWS::StackName}-public-instance-id
 
   PrivateInstanceId:
-    Description: ID of the private EC2 instance (máy chủ EC2 riêng tư)
+    Description: ID of the private EC2 instance 
     Value: !Ref PrivateEC2Instance
     Export:
       Name: !Sub ${AWS::StackName}-private-instance-id
 
   PublicInstancePublicIp:
-    Description: Public IP of the public EC2 instance (địa chỉ IP công cộng)
+    Description: Public IP of the public EC2 instance 
     Value: !GetAtt PublicEC2Instance.PublicIp
     Export:
       Name: !Sub ${AWS::StackName}-public-instance-ip 
