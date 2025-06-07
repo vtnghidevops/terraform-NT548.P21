@@ -1,9 +1,9 @@
-prefix             = "terraform-lab1"
+prefix             = "terraform-lab2"
 region             = "us-east-1"
 vpc_cidr           = "10.0.0.0/16"
 public_subnet_cidr = "10.0.1.0/24"
 private_subnet_cidr = "10.0.2.0/24"
 allowed_ip         = "0.0.0.0/0"  # In production, restrict this to your IP
-ami_id             = "ami-0e83be366243f524a"  # Amazon Linux 2023 in us-east-1
+ami_id             = "ami-02457590d33d576c3"  # Amazon Linux 2023 in us-east-1
 instance_type      = "t2.micro"
-# key_name         = "your-key-pair-name"  # Uncomment and specify your key pair name 
+key_name         = "terrafomr-lab"  # Uncomment and specify your key pair name 
