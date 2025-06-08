@@ -31,7 +31,7 @@ variable "private_subnet_cidr" {
 variable "allowed_ip" {
   description = "IP address allowed to connect to public instances (địa chỉ IP được phép)"
   type        = string
-  default     = "192.168.1.0/24"  
+  default     = "192.168.1.0/24"
   validation {
     condition     = !contains(["0.0.0.0/0"], var.allowed_ip)
     error_message = "The allowed_ip cannot be 0.0.0.0/0 for security reasons. Please specify a restricted IP range."
@@ -41,7 +41,7 @@ variable "allowed_ip" {
 variable "ami_id" {
   description = "AMI ID for the instances (ID của Amazon Machine Image)"
   type        = string
-  default     = "ami-0e83be366243f524a"  # Amazon Linux 2023 in us-east-1
+  default     = "ami-0e83be366243f524a" # Amazon Linux 2023 in us-east-1
 }
 
 variable "instance_type" {
