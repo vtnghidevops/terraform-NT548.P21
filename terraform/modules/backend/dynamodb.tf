@@ -6,9 +6,10 @@ resource "aws_dynamodb_table" "terraform_locks" {
   point_in_time_recovery {
     enabled = true
   }
-  # Enable server-side encryption with AWS managed key
+  # Enable server-side encryption with Customer Managed Key
   server_side_encryption {
-    enabled = true
+    enabled     = true
+    kms_key_arn = aws_kms_key.dynamodb_key.arn
   }
   attribute {
     name = "LockID"
