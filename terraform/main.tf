@@ -1,10 +1,12 @@
-provider "aws" {
-  region = var.region
-}
 
 locals {
   # Ensure allowed_ip is never 0.0.0.0/0, default to a specific IP if it is
   safe_allowed_ip = var.allowed_ip == "0.0.0.0/0" ? "192.168.1.1/32" : var.allowed_ip
+}
+
+# Backend Lock Table
+module "backend_lock_table" {
+  source = "./modules/backend"
 }
 
 # VPC Module
