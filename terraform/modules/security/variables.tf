@@ -15,3 +15,13 @@ variable "allowed_ip" {
   default     = "14.169.33.91/32"  
 } 
 
+variable "public_subnet_id" {
+  description = "ID of the public subnet"
+  type        = string
+}
+
+variable "private_subnet_id" {
+  description = "ID of the private subnet"
+  type        = string
+} 
+
