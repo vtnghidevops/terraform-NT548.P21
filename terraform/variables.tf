@@ -31,7 +31,7 @@ variable "private_subnet_cidr" {
 variable "allowed_ip" {
   description = "IP address allowed to connect to public instances (địa chỉ IP được phép)"
   type        = string
-  default     = "0.0.0.0/0"  # In production, this should be restricted
+  default     = "192.168.1.0/24"  
 }
 
 variable "ami_id" {

@@ -34,4 +34,14 @@ module "ec2" {
   public_security_group_id  = module.security.public_ec2_security_group_id
   private_security_group_id = module.security.private_ec2_security_group_id
   key_name                = var.key_name
+}
+
+# Use the default security group with an elastic network interface to ensure it's attached
+resource "aws_network_interface" "default_eni" {
+  subnet_id       = module.vpc.public_subnet_id
+  security_groups = [module.security.default_security_group_id]
+  
+  tags = {
+    Name = "${var.prefix}-default-eni"
+  }
 } 
