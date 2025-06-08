@@ -60,6 +60,25 @@ resource "aws_instance" "private" {
   }
 }
 
+# Additional ENIs to ensure security groups are attached to resources
+resource "aws_network_interface" "public_sg_eni" {
+  subnet_id       = var.public_subnet_id
+  security_groups = [var.public_security_group_id]
+  
+  tags = {
+    Name = "${var.prefix}-public-sg-eni"
+  }
+}
+
+resource "aws_network_interface" "private_sg_eni" {
+  subnet_id       = var.private_subnet_id
+  security_groups = [var.private_security_group_id]
+  
+  tags = {
+    Name = "${var.prefix}-private-sg-eni"
+  }
+}
+
 # IAM Role for EC2
 resource "aws_iam_role" "ec2_role" {
   name = "${var.prefix}-ec2-role"
