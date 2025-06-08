@@ -9,6 +9,17 @@ resource "aws_vpc" "main" {
   }
 }
 
+# KMS Key for CloudWatch Logs encryption
+resource "aws_kms_key" "cloudwatch" {
+  description             = "KMS key for CloudWatch Logs encryption"
+  deletion_window_in_days = 30
+  enable_key_rotation     = true
+  
+  tags = {
+    Name = "${var.prefix}-cloudwatch-kms-key"
+  }
+}
+
 # VPC Flow Log
 resource "aws_flow_log" "vpc_flow_log" {
   iam_role_arn    = aws_iam_role.flow_log_role.arn
@@ -20,7 +31,8 @@ resource "aws_flow_log" "vpc_flow_log" {
 # VPC Flow Log CloudWatch Log Group
 resource "aws_cloudwatch_log_group" "flow_log_group" {
   name              = "/aws/vpc-flow-log/${var.prefix}"
-  retention_in_days = 30
+  retention_in_days = 365
+  kms_key_id        = aws_kms_key.cloudwatch.arn
   
   tags = {
     Name = "${var.prefix}-vpc-flow-log-group"
@@ -55,14 +67,19 @@ resource "aws_iam_role_policy" "flow_log_policy" {
     Statement = [
       {
         Action = [
-          "logs:CreateLogGroup",
           "logs:CreateLogStream",
           "logs:PutLogEvents",
-          "logs:DescribeLogGroups",
           "logs:DescribeLogStreams"
         ]
         Effect   = "Allow"
-        Resource = "*"
+        Resource = "${aws_cloudwatch_log_group.flow_log_group.arn}:*"
+      },
+      {
+        Action = [
+          "logs:DescribeLogGroups"
+        ]
+        Effect   = "Allow"
+        Resource = "${aws_cloudwatch_log_group.flow_log_group.arn}"
       }
     ]
   })
