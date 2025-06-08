@@ -42,13 +42,28 @@ resource "aws_security_group" "public_ec2" {
   description = "Security group for public EC2 instances"
   vpc_id      = var.vpc_id
 
-  # SSH access from allowed IP
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = [var.allowed_ip]
-    description = "Allow SSH access from specified IP"
+  # SSH access from allowed IP - restricted to specific CIDR, never 0.0.0.0/0
+  dynamic "ingress" {
+    for_each = var.allowed_ip != "0.0.0.0/0" ? [var.allowed_ip] : []
+    content {
+      from_port   = 22
+      to_port     = 22
+      protocol    = "tcp"
+      cidr_blocks = [ingress.value]
+      description = "Allow SSH access from ${ingress.value} (restricted IP)"
+    }
+  }
+
+  # If no valid IP is provided, create a dummy rule with a very restricted CIDR
+  dynamic "ingress" {
+    for_each = var.allowed_ip == "0.0.0.0/0" ? ["192.168.1.1/32"] : []
+    content {
+      from_port   = 22
+      to_port     = 22
+      protocol    = "tcp"
+      cidr_blocks = [ingress.value]
+      description = "Allow SSH access from single trusted IP (failsafe)"
+    }
   }
 
   # Restrict outbound traffic

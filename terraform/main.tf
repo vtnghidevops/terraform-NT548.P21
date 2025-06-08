@@ -2,6 +2,11 @@ provider "aws" {
   region = var.region
 }
 
+locals {
+  # Ensure allowed_ip is never 0.0.0.0/0, default to a specific IP if it is
+  safe_allowed_ip = var.allowed_ip == "0.0.0.0/0" ? "192.168.1.1/32" : var.allowed_ip
+}
+
 # VPC Module
 module "vpc" {
   source = "./modules/vpc"
@@ -19,7 +24,7 @@ module "security" {
 
   prefix            = var.prefix
   vpc_id            = module.vpc.vpc_id
-  allowed_ip        = var.allowed_ip
+  allowed_ip        = local.safe_allowed_ip
   public_subnet_id  = module.vpc.public_subnet_id
   private_subnet_id = module.vpc.private_subnet_id
 }
