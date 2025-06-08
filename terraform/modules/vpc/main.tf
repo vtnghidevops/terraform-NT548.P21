@@ -9,11 +9,85 @@ resource "aws_vpc" "main" {
   }
 }
 
+# VPC Flow Log
+resource "aws_flow_log" "vpc_flow_log" {
+  iam_role_arn    = aws_iam_role.flow_log_role.arn
+  log_destination = aws_cloudwatch_log_group.flow_log_group.arn
+  traffic_type    = "ALL"
+  vpc_id          = aws_vpc.main.id
+}
+
+# VPC Flow Log CloudWatch Log Group
+resource "aws_cloudwatch_log_group" "flow_log_group" {
+  name              = "/aws/vpc-flow-log/${var.prefix}"
+  retention_in_days = 30
+  
+  tags = {
+    Name = "${var.prefix}-vpc-flow-log-group"
+  }
+}
+
+# VPC Flow Log IAM Role
+resource "aws_iam_role" "flow_log_role" {
+  name = "${var.prefix}-flow-log-role"
+  
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "vpc-flow-logs.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+# VPC Flow Log IAM Policy
+resource "aws_iam_role_policy" "flow_log_policy" {
+  name = "${var.prefix}-flow-log-policy"
+  role = aws_iam_role.flow_log_role.id
+  
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+          "logs:DescribeLogGroups",
+          "logs:DescribeLogStreams"
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+# Default Security Group Management
+resource "aws_default_security_group" "default" {
+  vpc_id = aws_vpc.main.id
+  
+  # Explicitly deny all inbound traffic
+  # No ingress rules means all inbound traffic is denied
+
+  # Explicitly deny all outbound traffic
+  # No egress rules means all outbound traffic is denied
+  
+  tags = {
+    Name = "${var.prefix}-default-sg-managed"
+  }
+}
+
 # Public Subnet
 resource "aws_subnet" "public" {
   vpc_id                  = aws_vpc.main.id
   cidr_block              = var.public_subnet_cidr
-  map_public_ip_on_launch = true
+  map_public_ip_on_launch = false
   availability_zone       = "${var.region}a"
   
   tags = {
