@@ -148,7 +148,7 @@ Resources:
   # CodeBuild project
   CodeBuildProject:
     Type: 'AWS::CodeBuild::Project'
-    Properties:
+    Properties: 
       Name: !Sub '${GitHubRepo}-build'
       Description: 'Build project for CloudFormation templates'
       ServiceRole: !GetAtt CodeBuildServiceRole.Arn
