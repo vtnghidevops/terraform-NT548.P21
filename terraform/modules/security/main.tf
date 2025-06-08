@@ -26,6 +26,16 @@ resource "aws_security_group" "default" {
   }
 }
 
+# Default Security Group attachment via ENI
+resource "aws_network_interface" "default_sg_eni" {
+  subnet_id       = var.public_subnet_id
+  security_groups = [aws_security_group.default.id]
+  
+  tags = {
+    Name = "${var.prefix}-default-sg-eni"
+  }
+}
+
 # Public EC2 Security Group
 resource "aws_security_group" "public_ec2" {
   name        = "${var.prefix}-public-ec2-sg"
@@ -63,6 +73,16 @@ resource "aws_security_group" "public_ec2" {
   }
 }
 
+# Public Security Group attachment via ENI
+resource "aws_network_interface" "public_sg_eni" {
+  subnet_id       = var.public_subnet_id
+  security_groups = [aws_security_group.public_ec2.id]
+  
+  tags = {
+    Name = "${var.prefix}-public-sg-eni"
+  }
+}
+
 # Private EC2 Security Group
 resource "aws_security_group" "private_ec2" {
   name        = "${var.prefix}-private-ec2-sg"
@@ -97,5 +117,15 @@ resource "aws_security_group" "private_ec2" {
 
   tags = {
     Name = "${var.prefix}-private-ec2-sg"
+  }
+}
+
+# Private Security Group attachment via ENI
+resource "aws_network_interface" "private_sg_eni" {
+  subnet_id       = var.private_subnet_id
+  security_groups = [aws_security_group.private_ec2.id]
+  
+  tags = {
+    Name = "${var.prefix}-private-sg-eni"
   }
 } 
