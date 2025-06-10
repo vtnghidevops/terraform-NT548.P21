@@ -107,6 +107,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "terraform_state" {
     id     = "state-retention"
     status = "Enabled"
 
+    # Add required filter (can be empty but must be present)
+    filter {}
+
     # Move older versions to cheaper storage after 30 days
     noncurrent_version_transition {
       noncurrent_days = 30
