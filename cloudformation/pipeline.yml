@@ -42,11 +42,27 @@ Resources:
           - 's3:GetObject'
           - 's3:GetObjectVersion'
           - 's3:PutObject'
+          - 's3:CreateBucket'
+          - 's3:PutBucketPolicy'
+          - 's3:PutBucketVersioning'
+          - 's3:PutLifecycleConfiguration'
+          - 's3:ListBucket'
           Resource:
           - !Sub 'arn:aws:s3:::${ArtifactBucket}/*'
+          - 'arn:aws:s3:::tcat-*'
+          - !Sub 'arn:aws:s3:::tcat-*/*'
         - Effect: Allow
           Action:
           - 'cloudformation:ValidateTemplate'
+          - 'cloudformation:CreateStack'
+          - 'cloudformation:DeleteStack'
+          - 'cloudformation:DescribeStacks'
+          - 'cloudformation:UpdateStack'
+          - 'cloudformation:CreateChangeSet'
+          - 'cloudformation:DeleteChangeSet'
+          - 'cloudformation:DescribeChangeSet'
+          - 'cloudformation:ExecuteChangeSet'
+          - 'cloudformation:SetStackPolicy'
           Resource: '*'
         - Effect: Allow
           Action:
