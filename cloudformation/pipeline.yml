@@ -158,7 +158,7 @@ Resources:
         PrivilegedMode: false
       Source:
         Type: CODEPIPELINE
-        BuildSpec: cloudformation/buildspec.yml
+        BuildSpec: buildspec.yml
       TimeoutInMinutes: 10
 
   # CodePipeline
@@ -214,8 +214,8 @@ Resources:
           Configuration:
             ActionMode: CREATE_UPDATE
             StackName: !Ref CloudFormationStackName
-            TemplatePath: BuildOutput::cloudformation/cloudformation.yml
-            TemplateConfiguration: BuildOutput::cloudformation/parameters.json
+            TemplatePath: BuildOutput::cloudformation.yml
+            TemplateConfiguration: BuildOutput::parameters.json
             RoleArn: !GetAtt CloudFormationExecutionRole.Arn
             Capabilities: CAPABILITY_IAM,CAPABILITY_NAMED_IAM,CAPABILITY_AUTO_EXPAND
           InputArtifacts:
