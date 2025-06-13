@@ -2,10 +2,6 @@
 data "aws_s3_bucket" "terraform_state_exists" {
   count  = 1
   bucket = "terraform-state-bucket-lab2-group8"
-
-  lifecycle {
-    ignore_changes = all
-  }
 }
 
 locals {

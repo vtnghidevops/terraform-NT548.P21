@@ -2,10 +2,6 @@
 data "aws_dynamodb_table" "terraform_locks_exists" {
   count = 1
   name  = "terraform-locks-lab2-group8"
-
-  lifecycle {
-    ignore_changes = all
-  }
 }
 
 locals {
