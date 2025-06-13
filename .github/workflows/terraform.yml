@@ -37,7 +37,7 @@ jobs:
 
     # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
     - name: Terraform Init
-      run: cd terraform && terraform init
+      run: cd terraform/main && terraform init
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -48,19 +48,19 @@ jobs:
 
     # Validate the Terraform files
     - name: Terraform Validate
-      run: cd terraform && terraform validate
+      run: cd terraform/main && terraform validate
 
     # Run Checkov for security scanning
     - name: Run Checkov
       uses: bridgecrewio/checkov-action@master
       with:
-        directory: terraform
+        directory: terraform/main
         framework: terraform
 
     # Generate an execution plan for Terraform
     - name: Terraform Plan
       if: github.event_name == 'pull_request'
-      run: cd terraform && terraform plan
+      run: cd terraform/main && terraform plan
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -68,7 +68,7 @@ jobs:
     # Apply Terraform changes (only on main branch)
     - name: Terraform Apply
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      run: cd terraform && terraform apply -auto-approve
+      run: cd terraform/main && terraform apply -auto-approve
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

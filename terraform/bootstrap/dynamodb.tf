@@ -24,11 +24,6 @@ resource "aws_dynamodb_table" "terraform_locks" {
     Environment = "dev"
   }
   
-  # Enable server-side encryption with KMS Customer Managed Key
-  server_side_encryption {
-    enabled     = true
-    kms_key_arn = data.aws_kms_alias.terraform_key[0].target_key_id
-  }
   
   # Prevent table deletion if it exists
   lifecycle {
