@@ -8,13 +8,6 @@ locals {
   dynamodb_table_exists = length(data.aws_dynamodb_table.terraform_locks_exists) > 0 ? true : false
 }
 
-resource "aws_kms_key" "dynamodb_key" {
-  count                   = local.dynamodb_table_exists ? 0 : 1
-  description             = "KMS key for DynamoDB table encryption"
-  deletion_window_in_days = 10
-  enable_key_rotation     = true
-}
-
 resource "aws_dynamodb_table" "terraform_locks" {
   count          = local.dynamodb_table_exists ? 0 : 1
   name           = "terraform-locks-lab2-group8"
@@ -34,7 +27,7 @@ resource "aws_dynamodb_table" "terraform_locks" {
   # Enable server-side encryption with KMS Customer Managed Key
   server_side_encryption {
     enabled     = true
-    kms_key_arn = aws_kms_key.dynamodb_key[0].arn
+    kms_key_arn = data.aws_kms_alias.terraform_key[0].target_key_id
   }
   
   # Prevent table deletion if it exists
