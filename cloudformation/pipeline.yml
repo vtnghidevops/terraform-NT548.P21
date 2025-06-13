@@ -5,17 +5,14 @@ Parameters:
   CodeCommitRepositoryName:
     Type: String
     Default: cloudformation-lab2-group8-repo
-    Description: CodeCommit repository name
 
   CodeCommitBranchName:
     Type: String
     Default: main
-    Description: CodeCommit repository branch
 
   CloudFormationStackName:
     Type: String
     Default: cloudformation-lab2-group8
-    Description: Name of CloudFormation stack to be deployed
 
 Resources:
   # S3 bucket for storing artifacts
