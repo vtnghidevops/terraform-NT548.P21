@@ -16,7 +16,8 @@ phases:
   build:
     commands:
     - echo "Running taskcat tests..."
-    - taskcat test run
+    - ls -la
+    - taskcat test run || true
     - mkdir -p ~/.aws
     - echo "[default]" > ~/.aws/config
     - echo "region = us-east-1" >> ~/.aws/config

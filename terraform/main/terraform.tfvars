@@ -4,6 +4,6 @@ vpc_cidr            = "10.0.0.0/16"
 public_subnet_cidr  = "10.0.1.0/24"
 private_subnet_cidr = "10.0.2.0/24"
 allowed_ip          = "192.168.1.0/24"  
-ami_id              = "ami-02457590d33d576c3" # Amazon Linux 2023 in us-east-1
+ami_id              = "ami-09e6f87a47903347c" # Amazon Linux 2023 in us-east-1
 instance_type       = "t2.micro"
 key_name            = "terraform-lab" # Uncomment and specify your key pair name 
