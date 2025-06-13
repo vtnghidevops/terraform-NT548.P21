@@ -1,5 +1,4 @@
 locals {
-  # Ensure allowed_ip is never 0.0.0.0/0, default to a specific IP if it is
   safe_allowed_ip = var.allowed_ip == "0.0.0.0/0" ? "192.168.1.1/32" : var.allowed_ip
 }
 
@@ -39,7 +38,6 @@ module "ec2" {
   key_name                  = var.key_name
 }
 
-# Use the default security group with an elastic network interface to ensure it's attached
 resource "aws_network_interface" "default_eni" {
   subnet_id       = module.vpc.public_subnet_id
   security_groups = [module.security.default_security_group_id]

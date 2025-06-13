@@ -1,230 +1,82 @@
-# AWS Infrastructure as Code with Terraform and CloudFormation
+# VTNghi DevOps Portfolio
 
-This project deploys AWS infrastructure using two Infrastructure as Code (IaC) approaches:
+<div align="center">
+  <img src="https://github-readme-stats.vercel.app/api?username=vtnghidevops&show_icons=true&theme=radical" alt="VTNghi's GitHub Stats" />
+</div>
 
-1. **Terraform**: Deploy AWS VPC, EC2, and related components
-2. **CloudFormation**: Deploy the same infrastructure with automated CI/CD pipeline
+## 📚 About This Repository
 
-## Architecture
+This repository contains infrastructure as code (IaC) for AWS cloud resources using Terraform. The project implements secure infrastructure deployment following best practices and security standards.
 
-```
-┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                                           AWS Cloud                                                                   │
-│                                                                                                                                       │
-│  ┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐       │
-│  │                                                           VPC                                                             │       │
-│  │                                                                                                                           │       │
-│  │  ┌────────────────────────────────────────────────┐              ┌────────────────────────────────────────────────┐      │       │
-│  │  │            Public Subnet (10.0.1.0/24)         │              │            Private Subnet (10.0.2.0/24)         │      │       │
-│  │  │                                                │              │                                                │      │       │
-│  │  │                                                │              │                                                │      │       │
-│  │  │    ┌────────────────┐       ┌───────────────┐  │              │    ┌────────────────┐                          │      │       │
-│  │  │    │                │       │               │  │              │    │                │                          │      │       │
-│  │  │    │ Public EC2     │       │ NAT Gateway   │  │              │    │ Private EC2    │                          │      │       │
-│  │  │    │ Instance       │       │               │  │              │    │ Instance       │                          │      │       │
-│  │  │    │                │       │               │  │              │    │                │                          │      │       │
-│  │  │    └────────────────┘       └───────────────┘  │              │    └────────────────┘                          │      │       │
-│  │  │                                 │              │              │                                                │      │       │
-│  │  │                                 │              │              │                                                │      │       │
-│  │  └─────────────────────────────────┼──────────────┘              └────────────────────────────────────────────────┘      │       │
-│  │                                    │                                               ▲                                      │       │
-│  │                                    │                                               │                                      │       │
-│  │                                    ▼                                               │                                      │       │
-│  │                           ┌─────────────────┐                           ┌──────────┴─────────┐                            │       │
-│  │                           │ Internet        │                           │                    │                            │       │
-│  │                           │ Gateway         │◄────────────────────────►│ Route Tables       │                            │       │
-│  │                           │                 │                           │                    │                            │       │
-│  │                           └─────────────────┘                           └────────────────────┘                            │       │
-│  │                                    ▲                                                                                      │       │
-│  └────────────────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────┘       │
-│                                        │                                                                                              │
-│                                        │                                                                                              │
-│                                        ▼                                                                                              │
-│                                    Internet                                                                                           │
-└───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-```
+### 🔑 Key Features
 
-## Project Structure
+- ✅ Secure Terraform state management with S3 and DynamoDB
+- ✅ AWS resources with security best practices
+- ✅ CI/CD pipeline for infrastructure deployment
+- ✅ Modular and reusable Terraform code
 
-```
-.
-├── terraform/              # Terraform source code
-│   ├── main.tf             # Main file
-│   ├── variables.tf        # Variable definitions
-│   ├── outputs.tf          # Output definitions
-│   ├── terraform.tfvars    # Variable values
-│   ├── scripts/            # Testing scripts
-│   │   ├── test_aws_resources.sh   # Resource testing script (Linux/macOS)
-│   │   └── test_aws_resources.ps1  # Resource testing script (Windows)
-│   └── modules/            # Terraform modules
-│       ├── ec2/            # EC2 module
-│       ├── security/       # Security Groups module
-│       └── vpc/            # VPC module
-├── cloudformation/         # CloudFormation source code
-│   ├── cloudformation.yaml # CloudFormation template
-│   ├── pipeline.yaml       # CodePipeline configuration
-│   ├── buildspec.yml       # AWS CodeBuild configuration
-│   ├── parameters.json     # CloudFormation parameters
-│   ├── taskcat.yml         # TaskCat configuration
-│   └── README.md           # CloudFormation guide
-└── .github/                # GitHub CI/CD
-    └── workflows/
-        └── terraform.yml   # GitHub Actions workflow
-```
+## 🛠️ Infrastructure Components
 
-## Architecture Overview
+### Bootstrap Module
 
-The infrastructure includes:
+The bootstrap module creates the foundation for Terraform state management:
 
-- VPC with public and private subnets
-- Internet Gateway and NAT Gateway for internet connectivity
-- Route Tables for both subnets
-- Security Groups for EC2 instances
-- EC2 instances in both public and private subnets
+- S3 bucket with encryption, versioning, and replication
+- DynamoDB table with encryption for state locking
+- KMS keys for encryption
 
-## Environment Requirements
+### Main Infrastructure
 
-- AWS account with permissions to deploy infrastructure
-- AWS CLI installed and configured
-- Terraform CLI (version 1.0+)
-- Git
-- GitHub account (for CI/CD)
+- EC2 instances with security configurations
+- VPC with proper network segmentation
+- Security groups with least privilege access
+- Database resources with encryption and backups
 
-## Environment Setup Guide
+## 🚀 Getting Started
 
-### 1. Install AWS CLI
+1. Clone this repository
+2. Set up AWS credentials
+3. Run bootstrap module first:
+   ```bash
+   cd terraform/bootstrap
+   terraform init
+   terraform apply
+   ```
+4. Deploy main infrastructure:
+   ```bash
+   cd ..
+   terraform init
+   terraform apply
+   ```
 
-**Windows:**
+## 🔒 Security Features
 
-```
-curl "https://awscli.amazonaws.com/AWSCLIV2.msi" -o "AWSCLIV2.msi"
-msiexec /i AWSCLIV2.msi
-```
+This infrastructure implements security best practices:
 
-**macOS:**
+- KMS encryption for sensitive data
+- Point-in-time recovery for databases
+- Cross-region replication for disaster recovery
+- Lifecycle policies for data management
+- Access logging and monitoring
+- No public access to sensitive resources
 
-```
-brew install awscli
-```
+## 📊 Project Status
 
-**Linux:**
+<div align="center">
+  <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=vtnghidevops&layout=compact&theme=radical" alt="Top Languages" />
+</div>
 
-```
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-unzip awscliv2.zip
-sudo ./aws/install
-```
+## 📝 License
 
-Configure AWS CLI:
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-```
-aws configure
-```
+## 🤝 Connect with Me
 
-### 2. Install Terraform
-
-**Windows:** Download and install from [terraform.io](https://www.terraform.io/downloads.html)
-
-**macOS:**
-
-```
-brew install terraform
-```
-
-**Linux:**
-
-```
-wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor | sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg
-echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-sudo apt update && sudo apt install terraform
-```
-
-### 3. Install Testing and Validation Tools
-
-**cfn-lint and TaskCat (for CloudFormation):**
-
-```
-pip install cfn-lint taskcat
-```
-
-**Checkov (for Terraform):**
-
-```
-pip install checkov
-```
-
-## Deploying with Terraform
-
-See details in [terraform/README.md](./terraform/README.md)
-
-## Deploying with CloudFormation
-
-See details in [cloudformation/README.md](./cloudformation/README.md)
-
-## Verifying Deployment Results
-
-### Terraform
-
-After deployment, check:
-
-```
-terraform output
-```
-
-Use the AWS resource testing script:
-
-**Linux/macOS:**
-
-```bash
-cd terraform
-chmod +x scripts/test_aws_resources.sh
-./scripts/test_aws_resources.sh
-```
-
-**Windows:**
-
-```powershell
-cd terraform
-.\scripts\test_aws_resources.ps1
-```
-
-The script will check all deployed AWS resources:
-
-- VPC and Subnets
-- EC2 instances and their status
-- SSH connectivity to public EC2
-
-Connect to public EC2 via SSH:
-
-```
-ssh -i your-key.pem ec2-user@<public-ip>
-```
-
-### CloudFormation
-
-Check stack information:
-
-```
-aws cloudformation describe-stacks --stack-name cloudformation-infrastructure
-```
-
-Check CodePipeline status:
-
-```
-aws codepipeline get-pipeline-state --name <pipeline-name>
-```
-
-## Cleaning Up Resources
-
-### Terraform
-
-```
-terraform destroy
-```
-
-### CloudFormation
-
-```
-aws cloudformation delete-stack --stack-name cloudformation-infrastructure
-aws cloudformation delete-stack --stack-name cloudformation-pipeline
-```
+<div align="center">
+  <a href="https://github.com/vtnghidevops">
+    <img src="https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white" alt="GitHub" />
+  </a>
+  <a href="https://linkedin.com/in/vtnghidevops">
+    <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn" />
+  </a>
+</div>
