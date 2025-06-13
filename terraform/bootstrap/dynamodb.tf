@@ -1,5 +1,4 @@
 resource "aws_dynamodb_table" "terraform_locks" {
-  count          = local.create_table ? 1 : 0
   name           = "terraform-locks-lab2-group8"
   billing_mode   = "PAY_PER_REQUEST"  # Pay only for what you use
   hash_key       = "LockID"
