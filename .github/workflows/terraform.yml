@@ -50,7 +50,7 @@ jobs:
     - name: Terraform Validate
       run: cd terraform && terraform validate
 
-    # Run tfsec for security scanning
+    # Run Checkov for security scanning
     - name: Run Checkov
       uses: bridgecrewio/checkov-action@master
       with:
