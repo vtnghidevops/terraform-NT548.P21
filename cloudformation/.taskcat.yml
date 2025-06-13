@@ -2,7 +2,7 @@ project:
   name: cloudformation-lab2-group8
   regions:
   - us-east-1
-  package-lambda: false
+  package_lambda: false
   parameters:
     KeyName: 'terraform-lab'
 
